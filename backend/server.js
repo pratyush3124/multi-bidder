@@ -1,38 +1,40 @@
-const { createServer } = require("http");
-const { Server } = require("socket.io");
+const express = require('express');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
+const cors = require('cors');
 
-const httpServer = createServer();
-
+const app = express();
+const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
     origin: '*'
   }
 });
 
-io.on("connection", (socket) => {
-  console.log("New client connected:", socket.id);
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-  socket.on("placeBid", ({ username, bid }) => {
+// Socket.IO logic
+io.on('connection', (socket) => {
+  console.log('New client connected:', socket.id);
+
+  socket.on('placeBid', ({ username, bid }) => {
     console.log(`New bid from ${username}: $${bid}`);
-    
-    // Broadcast the new bid to all connected clients, including the username
-    io.emit("newBid", { username, bid });
+    io.emit('newBid', { username, bid });
   });
 
-  socket.on("disconnect", () => {
-    console.log("Client disconnected:", socket.id);
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
   });
 });
 
-// Create a simple GET endpoint /api/hello
-httpServer.on('request', (req, res) => {
-  if (req.method === 'GET' && req.url === '/api/hello') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ message: 'Hello, World!' }));
-  }
+// Express routes
+app.get('/api/hello', (req, res) => {
+  res.json({ message: 'Hello, World!' });
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
