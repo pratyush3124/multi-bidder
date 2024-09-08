@@ -24,6 +24,14 @@ io.on("connection", (socket) => {
   });
 });
 
+// Create a simple GET endpoint /api/hello
+httpServer.on('request', (req, res) => {
+  if (req.method === 'GET' && req.url === '/api/hello') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ message: 'Hello, World!' }));
+  }
+});
+
 const PORT = 3000;
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
