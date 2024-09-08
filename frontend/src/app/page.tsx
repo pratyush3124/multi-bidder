@@ -19,7 +19,9 @@ export default function Home() {
     const randomUsername = generateRandomUsername();
     setUsername(randomUsername);
 
-    const newSocket = io("localhost:3000");
+    console.log(process.env.NEXT_PUBLIC_BACKEND_URL)
+
+    const newSocket = io(process.env.NEXT_PUBLIC_BACKEND_URL || '');
     setSocket(newSocket);
 
     newSocket.on("connect", () => {
